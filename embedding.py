@@ -31,3 +31,18 @@ def load_w2v()
 	glove2word2vec(glovepath, temp_file)
 	glove = gensim.models.KeyedVectors.load_word2vec_format(tmp_file)
 	return glove
+
+def avg_weighting(dataframe,column):
+	val=0
+	for index,rows in dataframe.iterrows():
+		val+=dataframe[column]
+	val=val/len(DataFrame.index) 
+	return val
+
+def exp_weighting(dataframe,column,date_column,procedure_date,gap):
+	val=0
+	for index,rows in dataframe.iterrows():
+		delta=procedure_date-dataframe[date_column]-7
+		val+=exp(-(delta**2))*dataframe[column]
+	val=val/len(DataFrame.index) 
+	return val
