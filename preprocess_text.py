@@ -12,8 +12,11 @@ import re
 def initial_clean(text):
 	'''
 	Function to remove extra characters, convert to lowercase, and tokenize the sentence.
-	Input: String
-	Output: list of words
+
+	Input: 
+		- String
+	Output: 
+		- list of words
 	'''
     text = re.sub("((\S+)?(http(s)?)(\S+))|((\S+)?(www)(\S+))|((\S+)?(\@)(\S+)?)", " ", text)
     text = re.sub("[^a-zA-Z ]", "", text)
@@ -23,9 +26,12 @@ def initial_clean(text):
 
 def pad_punctuation(text):
 	'''
-	Function to add extra spaces around punctuations for improved tokenization
-	Input: String 
-	Output: String
+	Function to add extra spaces around punctuations for improved tokenization.
+
+	Input: 
+		- String 
+	Output: 
+		- String
 	'''
     PUNCTS = "!\"#$%'()*+,-./:;<=>?@[\]^_`{|}~"
     updated_list = []
@@ -39,8 +45,11 @@ def pad_punctuation(text):
 def stem_words(text):
 	'''
 	Function for stemming words.
-	Input: List of words
-	Output: List of words
+
+	Input: 
+		- List of words
+	Output: 
+	 	- List of words
 	'''
   stemmer = PorterStemmer()
   try:
@@ -53,8 +62,11 @@ def stem_words(text):
 def lem_words(text):
 	'''
 	Function for lemmatizing words.
-	Input: List of words
-	Output: List of words
+
+	Input: 
+		- List of words
+	Output: 
+		- List of words
 	'''
   lemmatizer = WordNetLemmatizer()
   try:
@@ -67,8 +79,12 @@ def lem_words(text):
 def remove_stop_words(text):
 	'''
 	Function for removing stopwords words.
-	Input: List of words
-	Output: List of words
+
+	Input: 
+		- List of words
+	
+	Output: 
+		- List of words
 	'''
   stop_words = stopwords.words('english')
   return [word for word in text if word not in stop_words]
@@ -76,8 +92,11 @@ def remove_stop_words(text):
 def apply_all(text):
 	'''
 	Function to apply all preprocessing techniques.
-	Input: string
-	Output: List of words
+
+	Input: 
+		- string
+	Output: 
+		- List of words
 	'''
   summary = lem_words(stem_words(remove_stop_words(initial_clean(pad_punctuation(text)))))
   return summary
