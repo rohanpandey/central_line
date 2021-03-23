@@ -57,6 +57,7 @@ def concatenate_dfs(dataframe1,dataframe2,left_on,right_on):
     return dataframe
 
 def ICD_mapping(column,dataframe):
+	df=dataframe
 	ICD_group=[]
 	G1=['A0{}'.format(i) for i in range(0,10)]+['A{}'.format(i) for i in range(10,100)]+['B0{}'.format(i) for i in range(0,10)]+['B{}'.format(i) for i in range(10,100)]
 	G2=['C0{}'.format(i) for i in range(0,10)]+['C{}'.format(i) for i in range(10,100)]+['D0{}'.format(i) for i in range(0,10)]+['D{}'.format(i) for i in range(10,50)]+['C7A','C7B','D3A']
@@ -80,7 +81,7 @@ def ICD_mapping(column,dataframe):
 	G20=['U0{}'.format(i) for i in range(0,10)]+['U{}'.format(i) for i in range(10,86)]
 	G21=['V0{}'.format(i) for i in range(0,10)]+['V{}'.format(i) for i in range(10,100)]+['W0{}'.format(i) for i in range(0,10)]+['W{}'.format(i) for i in range(10,100)]+['X0{}'.format(i) for i in range(0,10)]+['X{}'.format(i) for i in range(10,100)]+['Y0{}'.format(i) for i in range(0,10)]+['Y{}'.format(i) for i in range(10,100)]
 	G22=['Z0{}'.format(i) for i in range(0,10)]+['Z{}'.format(i) for i in range(10,100)]
-	for index,row in dataframe.iterrows():
+	for index,row in df.iterrows():
 	    if(row[column] in G1):
 	        ICD_group.append(1)
 	    if(row[column]in G2):
@@ -126,4 +127,4 @@ def ICD_mapping(column,dataframe):
 	    if(row[column] in G22):
 	    	ICD_group.append(22)
 	df['ICD_group']=ICD_group
-
+	return df
