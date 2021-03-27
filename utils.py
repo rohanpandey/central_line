@@ -1,10 +1,6 @@
 import pandas as pd 
 import numpy as np
 
-encounters_drop_list=['CPT Procedure',"Unnamed: 2","# Encounters"]
-patient_drop_list=['Patient Name','EMPI','D/C Disp','Unnamed: 9','Discharge Day','Discharge Timestamp','Reason for Visit','Metrics', '# Encs', '# Encs.1', '# Encs.2',
-       '# Encs.3', '# Encs.4']
-
 def preprocess_dropChars(number,column,dataframe):
     '''
     Funtion for dropping a specified number of characters from a given dataframe's column.
@@ -56,7 +52,17 @@ def concatenate_dfs(dataframe1,dataframe2,left_on,right_on):
     print("Columns concatenated")
     return dataframe
 
+
 def ICD_mapping(column,dataframe):
+	'''
+    Function for mapping ICD10 codes into groups.
+
+    Input:
+      - column - column name of the ICD-10 Codes
+      - dataframe - dataframe containing the ICD-10 codes
+    Output:
+      - Dataframe
+    '''
 	df=dataframe
 	ICD_group=[]
 	G1=['A0{}'.format(i) for i in range(0,10)]+['A{}'.format(i) for i in range(10,100)]+['B0{}'.format(i) for i in range(0,10)]+['B{}'.format(i) for i in range(10,100)]
@@ -81,50 +87,26 @@ def ICD_mapping(column,dataframe):
 	G20=['U0{}'.format(i) for i in range(0,10)]+['U{}'.format(i) for i in range(10,86)]
 	G21=['V0{}'.format(i) for i in range(0,10)]+['V{}'.format(i) for i in range(10,100)]+['W0{}'.format(i) for i in range(0,10)]+['W{}'.format(i) for i in range(10,100)]+['X0{}'.format(i) for i in range(0,10)]+['X{}'.format(i) for i in range(10,100)]+['Y0{}'.format(i) for i in range(0,10)]+['Y{}'.format(i) for i in range(10,100)]
 	G22=['Z0{}'.format(i) for i in range(0,10)]+['Z{}'.format(i) for i in range(10,100)]
-	for index,row in df.iterrows():
-	    if(row[column] in G1):
-	        ICD_group.append(1)
-	    if(row[column]in G2):
-	    	ICD_group.append(2)
-	    if(row[column] in G3):
-	        ICD_group.append(3)
-	    if(row[column] in G4):
-	    	ICD_group.append(4)
-	    if(row[column] in G5):
-	        ICD_group.append(5)
-	    if(row[column] in G6):
-	    	ICD_group.append(6)
-	    if(row[column] in G7):
-	        ICD_group.append(7)
-	    if(row[column] in G8):
-	    	ICD_group.append(8)
-	    if(row[column] in G9):
-	        ICD_group.append(9)
-	    if(row[column] in G10):
-	    	ICD_group.append(10)
-	    if(row[column] in G11):
-	        ICD_group.append(11)
-	    if(row[column] in G12):
-	    	ICD_group.append(12)
-	    if(row[column] in G13):
-	        ICD_group.append(13)
-	    if(row[column] in G14):
-	    	ICD_group.append(14)
-	    if(row[column] in G15):
-	        ICD_group.append(15)
-	    if(row[column] in G16):
-	    	ICD_group.append(16)
-	    if(row[column] in G17):
-	        ICD_group.append(17)
-	    if(row[column] in G18):
-	    	ICD_group.append(18)
-	    if(row[column] in G19):
-	        ICD_group.append(19)
-	    if(row[column] in G20):
-	    	ICD_group.append(20)
-	    if(row[column] in G21):
-	        ICD_group.append(21)
-	    if(row[column] in G22):
-	    	ICD_group.append(22)
-	df['ICD_group']=ICD_group
+	df.loc[df[column].isin(G1), 'ICD_group'] = 1
+	df.loc[df[column].isin( G2), 'ICD_group'] = 2
+	df.loc[df[column].isin( G3), 'ICD_group'] = 3
+	df.loc[df[column].isin( G4), 'ICD_group'] = 4
+	df.loc[df[column].isin( G5), 'ICD_group'] = 5
+	df.loc[df[column].isin( G6), 'ICD_group'] = 6
+	df.loc[df[column].isin( G7), 'ICD_group'] = 7
+	df.loc[df[column].isin( G8), 'ICD_group'] = 8
+	df.loc[df[column].isin( G9), 'ICD_group'] = 9
+	df.loc[df[column].isin( G10), 'ICD_group'] = 10
+	df.loc[df[column].isin( G11), 'ICD_group'] = 11
+	df.loc[df[column].isin( G12), 'ICD_group'] = 12
+	df.loc[df[column].isin( G13), 'ICD_group'] = 13
+	df.loc[df[column].isin( G14), 'ICD_group'] = 14
+	df.loc[df[column].isin( G15), 'ICD_group'] = 15
+	df.loc[df[column].isin( G16), 'ICD_group'] = 16
+	df.loc[df[column].isin( G17), 'ICD_group'] = 17
+	df.loc[df[column].isin( G18), 'ICD_group'] = 18
+	df.loc[df[column].isin( G19), 'ICD_group'] = 19
+	df.loc[df[column].isin( G20), 'ICD_group'] = 20
+	df.loc[df[column].isin( G21), 'ICD_group'] = 21
+	df.loc[df[column].isin( G22), 'ICD_group'] = 22
 	return df
