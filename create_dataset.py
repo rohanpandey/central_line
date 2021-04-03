@@ -46,7 +46,7 @@ op2 = pd.DataFrame(columns = column_names)
 for index,row in base_df.iterrows():
     start=time.time()
     temp_row=(row.to_dict())
-    start_date=row['Admit Timestamp']
+    start_date=row['Procedure_time']-datetime.timedelta(days=2)#row['Admit Timestamp']
     end_date=row['Procedure_time']
     EMPI_val=row['EMPI']
     df=ICD_df[ICD_df['EMPI']==EMPI_val].copy()
@@ -68,7 +68,7 @@ for index,row in base_df.iterrows():
             start_date=start_date+datetime.timedelta(days=1)
             df1=df1[0:0].copy()
     df=df[0:0].copy()
-    if(index==100):
+    if(index==1000):
         break
 
 op2.to_csv("/labs/banerjeelab/Central_line/Data/processed1.csv")
