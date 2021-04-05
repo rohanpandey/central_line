@@ -1,5 +1,8 @@
 from utils import *
 import pandas as pd
+import datetime
+import time
+from math import exp
 
 encounters_drop_list=["Unnamed: 2","# Encounters"]
 patient_drop_list=['Patient Name','D/C Disp','Unnamed: 9','Discharge Day','Discharge Timestamp','Reason for Visit','Metrics', '# Encs', '# Encs.1', '# Encs.2','# Encs.3', '# Encs.4']
@@ -37,14 +40,10 @@ for i in ICD_file_list:
 ICD_df['EMPI']=ICD_df['EMPI'].astype(str)
 ICD_df=ICD_df.dropna()
 ICD_df['ICD_group']=ICD_df['ICD_group'].astype(int)
-
-import datetime
-import time
-from math import exp
+start=time.time()
 column_names=base_df.columns.tolist()+['I1','I2','I3','I4','I5','I6','I7','I8','I9','I10','I11','I12','I13','I14','I15','I16','I17','I18','I19','I20','I21','I22','Y']
 op2 = pd.DataFrame(columns = column_names)
-for index,row in base_df.iterrows():
-    start=time.time()
+for index,row in base_df[:1000].iterrows():
     temp_row=(row.to_dict())
     start_date=row['Procedure_time']-datetime.timedelta(days=2)#row['Admit Timestamp']
     end_date=row['Procedure_time']
@@ -68,7 +67,5 @@ for index,row in base_df.iterrows():
             start_date=start_date+datetime.timedelta(days=1)
             df1=df1[0:0].copy()
     df=df[0:0].copy()
-    if(index==1000):
-        break
-
-op2.to_csv("/labs/banerjeelab/Central_line/Data/processed1.csv")
+print(time.time()-start)
+#op2.to_csv("/labs/banerjeelab/Central_line/Data/processed1.csv")

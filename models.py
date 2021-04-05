@@ -9,16 +9,16 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import GradientBoostingClassifier
-from keras.callbacks import EarlyStopping
-from keras.models import Sequential
-from keras.layers import Dense
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
 import xgboost as xgb
 import numpy as np
 
 def model_NN(X_train, Y_train,epochs,bs):
     early_stopping = EarlyStopping(monitor='loss', patience=10)
     model = Sequential()
-    model.add(Dense(50, input_dim=X_train.shape[0], activation='relu'))
+    model.add(Dense(50, input_dim=X_train.shape[1], activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     model.fit(X_train, Y_train, epochs=epochs, batch_size=bs,callbacks=[early_stopping])
@@ -34,15 +34,15 @@ def model_GB(X_train,Y_train):
     gbk.fit(X_train, Y_train)
     return gbk
 
-def model_DT(X_train,Y_train,category):
+def model_DT(X_train,Y_train):
     classifier=DecisionTreeClassifier(criterion="entropy",random_state=5)
     classifier.fit(X_train, Y_train)
     return classifier
 
 def model_NB(X_train,Y_train,category):
-    if(category='g'):
+    if(category=='g'):
         classifier=GaussianNB()
-    if(category='b'):
+    if(category=='b'):
         classifier=BernoulliNB()
     classifier.fit(X_train, Y_train)
     return classifier
@@ -87,4 +87,14 @@ def predict_performance(model,X_test,Y_test):
     r=val[1]
     f=val[2]
     return a,p,r,f
+
+def predict_performance_NN(model,X_test,Y_test):
+    Y_pred = (model.predict(X_test) > 0.5).astype("int32")
+    a=accuracy_score(Y_test,Y_pred)
+    val=precision_recall_fscore_support(Y_test, Y_pred, average='binary')
+    p=val[0]
+    r=val[1]
+    f=val[2]
+    return a,p,r,f
+    
     
