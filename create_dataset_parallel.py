@@ -5,25 +5,29 @@ import time
 from math import exp
 import multiprocessing as mp
 
-def divide_and_conquer(df,ICD_df):
-    N_ROWS = 100 # number of rows in each dataframe
-    with mp.Pool(16) as pool: # use 3 processes
+def divide_and_conquer(df):
+    n_workers=16
+    N_ROWS = round(len(df)/n_workers+1) # number of rows in each dataframe
+    with mp.Pool(n_workers) as pool: # use 3 processes
         # break up dataframe into smaller daraframes of N_ROWS rows each
         cnt = len(df.index)
         n, remainder = divmod(cnt, N_ROWS)
         results = []
         start_index = 0
         for i in range(n):
-            results.append(pool.apply_async(process_frame, args=(df.loc[start_index:start_index+N_ROWS-1, :],ICD_df)))
+            results.append(pool.apply_async(process_frame,(df.loc[start_index:start_index+N_ROWS-1, :],)))
             start_index += N_ROWS
         if remainder:
-            results.append(pool.apply_async(process_frame, args=(df.loc[start_index:start_index+remainder-1, :],ICD_df)))
+            results.append(pool.apply_async(process_frame,(df.loc[start_index:start_index+remainder-1, :],)))
+        #print(type(results),len(results))
+        print('start get')
         new_dfs = [result.get() for result in results]
+        print('end get')
         # reassemble final dataframe:
         df = pd.concat(new_dfs, ignore_index=True)
         return df
 
-def process_frame(base_df,ICD_df):
+def process_frame(base_df):
     column_names=base_df.columns.tolist()+['I1','I2','I3','I4','I5','I6','I7','I8','I9','I10','I11','I12','I13','I14','I15','I16','I17','I18','I19','I20','I21','I22','Y']
     op2 = pd.DataFrame(columns = column_names)
     for index,row in base_df.iterrows():
@@ -91,5 +95,7 @@ if __name__ == '__main__':
     ICD_df=ICD_df.dropna()
     ICD_df['ICD_group']=ICD_df['ICD_group'].astype(int)
     start=time.time()
-    divide_and_conquer(base_df[:1000],ICD_df)
-    print(time.time()-start)
+    df=divide_and_conquer(base_df[:5000])
+    print(time.time()-start)    
+    df.to_csv("/labs/banerjeelab/Central_line/Data/processed1_parallel.csv")
+    
