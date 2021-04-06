@@ -40,12 +40,10 @@ for i in ICD_file_list:
 ICD_df['EMPI']=ICD_df['EMPI'].astype(str)
 ICD_df=ICD_df.dropna()
 ICD_df['ICD_group']=ICD_df['ICD_group'].astype(int)
-start=time.time()
-column_names=base_df.columns.tolist()+['I1','I2','I3','I4','I5','I6','I7','I8','I9','I10','I11','I12','I13','I14','I15','I16','I17','I18','I19','I20','I21','I22','Y']
-op2 = pd.DataFrame(columns = column_names)
 
-for index,row in base_df[:10].iterrows():
-    days_lag=2
+op2 = pd.DataFrame()
+days_lag=2
+for index,row in base_df[:2].iterrows():
     gap=datetime.timedelta(days=days_lag)
     temp_row=(row.to_dict())
     start_date=row['Procedure_time']-datetime.timedelta(days=2)#row['Admit Timestamp']
@@ -54,16 +52,22 @@ for index,row in base_df[:10].iterrows():
     df=ICD_df[ICD_df['EMPI']==EMPI_val].copy()
     if df.empty==False:
         while end_date-start_date>=datetime.timedelta(days=1):
-            df1=df[(df['Service Day']<=start_date)and(df['Service Day']>=start_date-gap)].copy()
-            date_list = [start_date - datetime.timedelta(days=x) for x in range(days_lag+1)]
+            df1=df[(df['Service Day']<=start_date)&(df['Service Day']>=start_date-gap)].copy()
+            date_list = [(start_date-gap) + datetime.timedelta(days=x) for x in range(days_lag+1)]
+            date_list = pd.to_datetime(date_list,format="%m/%d/%Y")
             for i in range(1,23): 
                 df2=df1[df1['ICD_group']==i].copy()
-                df2=df2['Service Day']
-                for f in range(date_list):
-                    if(f in df2):
-                        temp_row['I'+str(i)+str(f)]=1
+                #if(df2.empty==False):
+                    #print(df2['Service Day'])
+                for f in range(len(date_list)):
+                    if(df2.empty==False):
+                        if(date_list[f] in df2['Service Day'].values):
+                            #print('Here','I'+str(i)+'_'+str(f))
+                            temp_row['I'+str(i)+'_'+str(f)]=1
+                        else:
+                            temp_row['I'+str(i)+'_'+str(f)]=0
                     else:
-                        temp_row['I'+str(i)+str(f)]=0
+                            temp_row['I'+str(i)+'_'+str(f)]=0
                 df2=df2[0:0].copy()
             if(end_date-start_date==datetime.timedelta(days=1)):
                 temp_row['Y']=1

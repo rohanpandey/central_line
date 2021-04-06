@@ -94,6 +94,6 @@ if __name__ == '__main__':
     ICD_df['EMPI']=ICD_df['EMPI'].astype(str)
     ICD_df=ICD_df.dropna()
     ICD_df['ICD_group']=ICD_df['ICD_group'].astype(int)
-    df=divide_and_conquer(base_df[:5000])   
-    df.to_csv("/labs/banerjeelab/Central_line/Data/processed1_parallel.csv")
+    df=divide_and_conquer(base_df)   
+    df.to_csv("/labs/banerjeelab/Central_line/Data/processed_parallel.csv")
     

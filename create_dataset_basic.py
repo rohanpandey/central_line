@@ -40,7 +40,6 @@ for i in ICD_file_list:
 ICD_df['EMPI']=ICD_df['EMPI'].astype(str)
 ICD_df=ICD_df.dropna()
 ICD_df['ICD_group']=ICD_df['ICD_group'].astype(int)
-start=time.time()
 column_names=base_df.columns.tolist()+['I1','I2','I3','I4','I5','I6','I7','I8','I9','I10','I11','I12','I13','I14','I15','I16','I17','I18','I19','I20','I21','I22','Y']
 op2 = pd.DataFrame(columns = column_names)
 for index,row in base_df[:1000].iterrows():
@@ -67,5 +66,4 @@ for index,row in base_df[:1000].iterrows():
             start_date=start_date+datetime.timedelta(days=1)
             df1=df1[0:0].copy()
     df=df[0:0].copy()
-print(time.time()-start)
-#op2.to_csv("/labs/banerjeelab/Central_line/Data/processed1.csv")
+op2.to_csv("/labs/banerjeelab/Central_line/Data/processed.csv")
