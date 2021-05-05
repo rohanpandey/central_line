@@ -42,7 +42,7 @@ ICD_df=ICD_df.dropna()
 ICD_df['ICD_group']=ICD_df['ICD_group'].astype(int)
 
 op2 = pd.DataFrame()
-days_lag=2
+days_lag=365
 for index,row in base_df[:2].iterrows():
     gap=datetime.timedelta(days=days_lag)
     temp_row=(row.to_dict())
@@ -78,4 +78,4 @@ for index,row in base_df[:2].iterrows():
             df1=df1[0:0].copy()
     df=df[0:0].copy()
 
-op2.to_csv("/labs/banerjeelab/Central_line/Data/processed1_timeseries.csv")
+op2.to_csv("/labs/banerjeelab/Central_line/Data/timeseries_dataset_basic.csv")

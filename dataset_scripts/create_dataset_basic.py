@@ -4,20 +4,26 @@ import datetime
 import time
 from math import exp
 
+#List of columns to drop
 encounters_drop_list=["Unnamed: 2","# Encounters"]
 patient_drop_list=['Patient Name','D/C Disp','Unnamed: 9','Discharge Day','Discharge Timestamp','Reason for Visit','Metrics', '# Encs', '# Encs.1', '# Encs.2','# Encs.3', '# Encs.4']
 ICD_drop_list=['ICD-10 Diagnosis DESC','Patient Name','Patient ID']
 medication_drop_list=['Unnamed: 1','Metrics']
+
 ICD_file_list=['ICD10s_2018_2019.csv','ICD10s_2016_2018.csv','ICD10s_2013_2016.csv']
 
+#Loading encounters file -> Contains the specific encounter stamps
 encounters_df=pd.read_csv("/labs/banerjeelab/Central_line/Data/Encounters.csv")
 encounters_df=drop_columns(encounters_drop_list,encounters_df)
 encounters_df=encounters_df.dropna()
+
+#Loading patients details -> to merge patient information
 patients_df=pd.read_csv("/labs/banerjeelab/Central_line/Data/Patient List.csv")
 patients_df=drop_columns(patient_drop_list,patients_df)
 patients_df=patients_df.dropna()
-base_df=concatenate_dfs(encounters_df,patients_df,'Encounter','Encounter')
 
+#Merging patients info with the encounters with matching encounter IDs
+base_df=concatenate_dfs(encounters_df,patients_df,'Encounter','Encounter')
 base_df['Date of Birth'] = pd.to_datetime(base_df['Date of Birth'], format="%m/%d/%Y")
 base_df['Service Day']=pd.to_datetime(base_df['Service Day'], format="%m/%d/%Y")
 base_df['Admit Timestamp']= pd.to_datetime(base_df['Admit Timestamp'],errors='coerce', format="%m/%d/%Y %H:%M:%S")
@@ -28,6 +34,7 @@ base_df['EMPI']=base_df['EMPI'].astype(str)
 base_df=drop_columns(['Date of Birth'],base_df)
 base_df=base_df.rename(columns={'Service Day':'Procedure_time','Patient ID':'Patient'})
 
+#Loading ICD codes data
 ICD_df=pd.DataFrame()
 for i in ICD_file_list:
     df=pd.read_csv("/labs/banerjeelab/Central_line/New_data/"+i)
@@ -37,12 +44,17 @@ for i in ICD_file_list:
     ICD['Service Day']=pd.to_datetime(ICD['Service Day'], format="%m/%d/%Y")
     ICD=drop_columns(ICD_drop_list,ICD)
     ICD_df=ICD_df.append(ICD)
+ICD_df['EMPI']=ICD_df['EMPI'].astype(int)
 ICD_df['EMPI']=ICD_df['EMPI'].astype(str)
 ICD_df=ICD_df.dropna()
 ICD_df['ICD_group']=ICD_df['ICD_group'].astype(int)
+
+#Generating Dataframe with ICD-Codes
 column_names=base_df.columns.tolist()+['I1','I2','I3','I4','I5','I6','I7','I8','I9','I10','I11','I12','I13','I14','I15','I16','I17','I18','I19','I20','I21','I22','Y']
 op2 = pd.DataFrame(columns = column_names)
-for index,row in base_df[:1000].iterrows():
+days_lag=365
+for index,row in base_df.iterrows():
+    gap=datetime.timedelta(days=days_lag)
     temp_row=(row.to_dict())
     start_date=row['Procedure_time']-datetime.timedelta(days=2)#row['Admit Timestamp']
     end_date=row['Procedure_time']
@@ -50,7 +62,7 @@ for index,row in base_df[:1000].iterrows():
     df=ICD_df[ICD_df['EMPI']==EMPI_val].copy()
     if df.empty==False:
         while end_date-start_date>=datetime.timedelta(days=1):
-            df1=df[df['Service Day']<=start_date].copy()
+            df1=df[(df['Service Day']<=start_date)&(df['Service Day']>=start_date-gap)].copy()
             df1['diff']=(start_date-df1['Service Day'])
             df1['diff']=df1['diff'].dt.days
             df1['weight']=np.exp(-np.power(df1['diff'],2))
@@ -66,4 +78,4 @@ for index,row in base_df[:1000].iterrows():
             start_date=start_date+datetime.timedelta(days=1)
             df1=df1[0:0].copy()
     df=df[0:0].copy()
-op2.to_csv("/labs/banerjeelab/Central_line/Data/processed.csv")
+op2.to_csv("/labs/banerjeelab/Central_line/Data/basic_dataset.csv")

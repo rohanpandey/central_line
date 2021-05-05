@@ -9,19 +9,36 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import GradientBoostingClassifier
-from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
+from keras.callbacks import EarlyStopping, ReduceLROnPlateau
+from keras.models import Sequential
+from keras.layers import Dense
 import xgboost as xgb
 import numpy as np
+from models_timeseries import *
+
+def model_LSTM1(X_train,Y_train,epochs,bs,features,demo_features,dimension,output_classes,no_of_groups,dense,BN,attn,dropout_lstm,dropout_dense):
+    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,patience=5, min_lr=1e-9)
+    model=LSTM_model_simple(features,demo_features,dimension,output_classes,no_of_groups,dense,BN,attn,dropout_lstm,dropout_dense)
+    model.compile(optimizer='adam', loss='binary_crossentropy')
+    #Set the inputs 
+    model.fit(X_train, Y_train, epochs=epochs, batch_size=bs,callbacks=[early_stopping,reduce_lr])
+    return model
+    
+def model_LSTM2(X_train,Y_train,epochs,bs,features,demo_features,dimension,output_classes,no_of_groups,dense,BN,attn,dropout_lstm,dropout_dense):
+    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,patience=5, min_lr=1e-9)
+    model=LSTM_model_combined(features,demo_features,dimension,output_classes,no_of_groups,dense,BN,attn,dropout_lstm,dropout_dense)
+    model.compile(optimizer='adam', loss='binary_crossentropy')
+    model.fit(X_train, Y_train, epochs=epochs, batch_size=bs,callbacks=[early_stopping,reduce_lr])
+    return model
 
 def model_NN(X_train, Y_train,epochs,bs):
+    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,patience=5, min_lr=1e-9)
     early_stopping = EarlyStopping(monitor='loss', patience=10)
     model = Sequential()
     model.add(Dense(50, input_dim=X_train.shape[1], activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    model.fit(X_train, Y_train, epochs=epochs, batch_size=bs,callbacks=[early_stopping])
+    model.fit(X_train, Y_train, epochs=epochs, batch_size=bs,callbacks=[early_stopping,reduce_lr])
     return model
 
 def model_XGB(X_train, Y_train):

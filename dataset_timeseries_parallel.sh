@@ -72,7 +72,7 @@
 ###                       your job's available memory will be limited to a default value
 ###                       which may not be high enough for your code to run successfully.
 ###                       This value is for the amount of RAM per computational node.
-#SBATCH --mem 12G
+#SBATCH --mem 20G
 
 ### (optional)
 ### Request 4 cpus/threads - Specify a value for this function if you know your code uses
@@ -91,7 +91,7 @@
 ###                                   parameter if you need to dedicate multiple threads to a
 ###                                   single program/application rather than running multiple
 ###                                   separate applications which require a single thread each.
-#SBATCH -c 8
+#SBATCH -c 16
 
 ### (very optional; leave as '1' unless you know what you're doing)
 ### Request 1 node - Only specify a value other than 1 for this option when you know that
@@ -114,4 +114,4 @@
 ### scl enable rh-python36 '/home/mynetid/my_wrapper_script.sh'
 ###
 ### Otherwise, you're probably not running everything you think you are in the SCL environment.
-scl enable rh-python36 'python ./create_dataset_parallel.py'
+scl enable rh-python36 'python ./dataset_scripts/create_dataset_parallel_timeseries.py'
